@@ -1,0 +1,2 @@
+# Installed into its own virtualenv (.venv-dbt): dbt and prefect pin conflicting dependencies.
+dbt-postgres

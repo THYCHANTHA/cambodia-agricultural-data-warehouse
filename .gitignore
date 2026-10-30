@@ -1,0 +1,31 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# environments and caches
+.venv/
+.venv-dbt/
+.venv-dbt-install.log
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# data: downloaded by scripts, never committed
+data/raw/
+data/processed/
+data/external/
+*.zip
+*.tif
+*.tiff
+*.parquet
+
+# dbt artefacts
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+logs/
+
+# prefect / local state
+.prefect/

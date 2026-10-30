@@ -1,0 +1,24 @@
+name: cadw
+version: "0.1.0"
+config-version: 2
+profile: cadw
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+models:
+  cadw:
+    silver:
+      +schema: silver
+      +materialized: table
+    gold:
+      +schema: gold
+      +materialized: table
+
+seeds:
+  cadw:
+    +schema: silver
+
+# Use the schema name exactly as written (no "<target>_" prefix).

@@ -1,0 +1,10 @@
+source_unit,canonical_unit,factor,note
+t,t,1,tonnes
+ha,ha,1,hectares
+kg/ha,kg/ha,1,kilograms per hectare
+An,animals,1,head count
+1000 An,animals,1000,thousand head to head
+No/An,eggs_per_animal,1,eggs per laying animal
+g/An,g_per_animal,1,grams per animal
+kg/An,kg_per_animal,1,kilograms per animal
+1000 No,number,1000,thousand units to units

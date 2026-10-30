@@ -1,0 +1,14 @@
+# Pipeline + app environment (.venv). dbt lives in a separate environment: see requirements-dbt.txt
+pandas>=2.2
+numpy>=1.26
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+requests>=2.31
+pydantic>=2.6
+pydantic-settings>=2.2
+rasterio>=1.3
+prefect>=3.0
+streamlit>=1.35
+plotly>=5.20
+pytest>=8
+ruff>=0.5

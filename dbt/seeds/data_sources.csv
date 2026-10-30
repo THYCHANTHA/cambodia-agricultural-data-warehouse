@@ -1,0 +1,5 @@
+source_name,publisher,description,url,licence_summary,native_grain
+faostat_production,FAO,FAOSTAT Crops and livestock products (QCL) bulk download,https://www.fao.org/faostat/en/#data/QCL,CC BY 4.0 (FAO database terms of use apply; attribution required),country-year-item
+worldbank_indicator,World Bank,World Development Indicators via Indicators API v2,https://api.worldbank.org/v2/,CC BY 4.0 (World Bank default licence for its datasets),country-year-indicator
+chirps_province_monthly,UC Santa Barbara Climate Hazards Center,CHIRPS v3.0 monthly precipitation aggregated to provinces,https://data.chc.ucsb.edu/products/CHIRPS/v3.0/,Public domain / CC BY 4.0 per CHC (cite doi:10.15780/G2JQ0P),province-month
+geoboundaries_adm1,geoBoundaries (William & Mary geoLab),Cambodia ADM1 provinces (gbOpen),https://www.geoboundaries.org/,ODbL 1.0 (attribution and share-alike for derived databases),province

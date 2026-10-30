@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: dim_geography
+    description: Country and province hierarchy (grain - one row per geographic unit).
+    columns:
+      - name: geography_key
+        tests: [unique, not_null]
+      - name: geography_level
+        tests:
+          - accepted_values:
+              arguments:
+                values: [country, province]
+
+      - name: parent_geography_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_geography')
+                field: geography_key
+
+  - name: dim_crop
+    description: FAOSTAT items with derived item_type and aggregate flag.
+    columns:
+      - name: crop_key
+        tests: [unique, not_null]
+      - name: item_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: [crop, livestock, processed_product]
+
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+
+  - name: dim_year
+    columns:
+      - name: year
+        tests: [unique, not_null]
+
+  - name: dim_indicator
+    columns:
+      - name: indicator_key
+        tests: [unique, not_null]
+
+  - name: dim_data_source
+    columns:
+      - name: source_key
+        tests: [unique, not_null]
+
+  - name: fact_crop_production
+    description: Grain - country x year x crop item (national level only).
+    columns:
+      - name: geography_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_geography')
+                field: geography_key
+
+      - name: crop_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_crop')
+                field: crop_key
+
+      - name: year
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_year')
+                field: year
+
+      - name: source_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_data_source')
+                field: source_key
+
+  - name: fact_climate_observation
+    description: Grain - province x month (CHIRPS v3.0 aggregated to ADM1).
+    columns:
+      - name: geography_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_geography')
+                field: geography_key
+
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: source_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_data_source')
+                field: source_key
+
+  - name: fact_indicator_observation
+    description: Grain - country x year x World Bank indicator.
+    columns:
+      - name: geography_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_geography')
+                field: geography_key
+
+      - name: indicator_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_indicator')
+                field: indicator_key
+
+      - name: year
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_year')
+                field: year
+
+      - name: source_key
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_data_source')
+                field: source_key

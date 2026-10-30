@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    description: Raw source data plus lineage columns, loaded by the Python ingestion layer.
+    tables:
+      - name: faostat_production
+      - name: faostat_flags
+      - name: worldbank_indicator
+      - name: geoboundaries_adm1
+      - name: chirps_province_monthly
+  - name: audit
+    schema: audit
+    tables:
+      - name: ingestion_log
