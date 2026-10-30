@@ -6,7 +6,11 @@ Streamlit dashboard.
 
 > **Scope.** National FAOSTAT crop statistics, World Bank indicators, CHIRPS rainfall aggregated to provinces,
 > and province boundaries. **There are no provincial crop statistics here and none are inferred.**
-> This is a research prototype, not an official statistical product.
+> This is a research prototype (release `v0.1.0`), not an official statistical product.
+>
+> **Rainfall coverage.** Only **one month of CHIRPS rainfall (July 2023) has been loaded and validated**. The
+> pipeline can ingest a longer window, but this repository makes **no claim of a complete historical rainfall
+> analysis**.
 
 ## Why this exists
 
@@ -28,19 +32,46 @@ Dimensions: `dim_date`, `dim_year`, `dim_geography` (country + 25 provinces), `d
 
 ## Validation status
 
-Every figure comes from an executed run (full output: [reports/validation_2026-10-31.md](reports/validation_2026-10-31.md)).
+Every figure comes from an executed run on 2026-10-31 (full unedited output:
+[reports/validation_2026-10-31_dbt-1.11.16.md](reports/validation_2026-10-31_dbt-1.11.16.md)). An earlier run on
+a dbt pre-release is kept as [a superseded record](reports/validation_2026-10-31_dbt-1.13.0b1_superseded.md).
+
+### Tested (executed, with results)
 
 | Check | Result |
 |---|---|
-| Unit + hygiene tests (no database) | 32 passed |
-| Database integration + dashboard smoke tests | 12 passed |
-| `dbt test` | 42 / 42 passed |
+| Unit + repository-hygiene tests (no database) | 32 passed |
+| Database integration + dashboard tests (live PostgreSQL 17.5) | 13 passed |
+| `dbt test` (dbt-core 1.11.16 stable, dbt-postgres 1.11.0) | 42 / 42 passed |
 | Independent Gold verification (`scripts/verify_gold.py`) | 31 / 31 passed |
 | Lint (`ruff`) | clean |
+| Dashboard visual review (desktop, Edge headless, all six pages) | done; defects found and fixed (see below) |
+| Data loaded and validated | FAOSTAT 12,621 rows, World Bank 528 rows, 25 provinces, **CHIRPS one month (2023-07)** |
 
-Not yet verified: the Docker configuration (Docker unavailable on the development machine), the GitHub Actions
-workflow (first run pending), the full CHIRPS window (only one month validated), and the dashboard's visual
-appearance. See [docs/limitations.md](docs/limitations.md).
+### Not tested or not claimed
+
+| Item | Status |
+|---|---|
+| **Docker** (`Dockerfile`, `docker-compose.yml`) | **Written but never built or run.** Docker is not installed on the development machine. Treat as untested |
+| GitHub Actions workflow | See the CI badge/results note below |
+| Rainfall beyond July 2023 | **Not loaded, not validated.** No historical rainfall analysis is claimed |
+| Mobile layout of the dashboard | Not reviewed |
+| Linux and macOS | Not run locally. Lock files were captured on Windows; CI installs from `requirements.txt` |
+
+The visual review found and fixed unreadable sidebar text in dark mode (now a forced light theme), raw column
+names on chart axes, and a missing sample-only warning on the Rainfall page.
+
+### Dashboard (research prototype, localhost)
+
+| Overview | Crop production (national, FAOSTAT) |
+|---|---|
+| ![Overview](reports/figures/dashboard_overview.png) | ![Crop production](reports/figures/dashboard_crop_production.png) |
+
+| Rainfall (one-month sample, with warning) | Data quality and lineage |
+|---|---|
+| ![Rainfall](reports/figures/dashboard_rainfall_sample.png) | ![Data quality](reports/figures/dashboard_data_quality.png) |
+
+See [docs/limitations.md](docs/limitations.md) for the full list of limitations.
 
 ## Quick start
 

@@ -1,0 +1,14 @@
+# Force the light design (white background, light-blue accents, dark-navy text) regardless of the
+# viewer's operating-system dark mode.
+[theme]
+base = "light"
+primaryColor = "#3B82C4"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#E8F1FA"
+textColor = "#0B2545"
+
+[browser]
+gatherUsageStats = false
+
+[server]
+address = "127.0.0.1"

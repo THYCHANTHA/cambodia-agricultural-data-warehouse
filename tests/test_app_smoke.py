@@ -31,3 +31,21 @@ def test_crop_page_defaults_to_rice_and_hides_aggregates():
     assert at.multiselect[0].value == ["Rice"]
     options = at.multiselect[0].options
     assert "Cereals, primary" not in options and "Rice" in options
+
+
+def test_rainfall_page_discloses_partial_coverage_when_under_a_year_is_loaded():
+    from sqlalchemy import text
+
+    from cadw import warehouse
+    from cadw.config import get_settings
+
+    with warehouse.make_engine(get_settings()).connect() as conn:
+        n = conn.execute(text("select count(distinct date_key) from gold.fact_climate_observation")).scalar()
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    at.sidebar.radio[0].set_value("Rainfall").run()
+    assert not at.exception
+    warned = [w.value for w in at.warning]
+    if n < 12:
+        assert any("not a historical rainfall analysis" in w for w in warned), warned
+    else:
+        assert not any("not a historical rainfall analysis" in w for w in warned)

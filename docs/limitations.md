@@ -10,8 +10,9 @@ This is a research prototype, not an official statistical product.
 2. **Rainfall is a satellite-gauge estimate** (CHIRPS), not a station measurement. Province values are the
    mean of 0.05 degree pixels whose centres fall inside the province boundary. A province smaller than one
    pixel falls back to every pixel it touches (`mask_method = all_touched`); none did in the validated month.
-3. **Rainfall coverage is a sample.** Validation was run on one month (July 2023). Any rainfall analysis
-   requires the wider window to be loaded and validated first (see `BUILD_STATUS.md` for the current state).
+3. **Rainfall coverage is a sample.** Only **one month (July 2023) has been loaded and validated**. No
+   historical rainfall analysis is claimed. Any such analysis requires the wider window to be loaded and
+   validated first; the dashboard shows a warning while fewer than 12 months are loaded.
 4. **Boundary vintage is 2017.** Province boundaries may differ from current administrative boundaries.
 5. **No temperature or other covariates** are integrated yet.
 6. **Missing values are preserved.** FAOSTAT blanks (flag `M`) and World Bank nulls stay NULL; nothing is imputed.
@@ -26,11 +27,12 @@ This is a research prototype, not an official statistical product.
 2. **No incremental loads.** Each source is fully refreshed per run. That is simple and safe at this size
    (12,621 FAOSTAT rows, 528 World Bank rows) but would not scale to large fact tables.
 3. **No slowly changing dimensions.** Only one boundary vintage exists.
-4. **Docker files are unverified.** Docker is not installed on the development machine, so the container
-   configuration has not been built or run.
+4. **Docker files are untested.** Docker is not installed on the development machine, so the container
+   configuration has never been built or run.
 5. **CI is unverified until the first GitHub run.** The workflow could not be executed locally.
-6. **The dashboard has been smoke-tested, not visually reviewed.** Automated tests confirm every page renders
-   against the live database without error; layout and appearance have not been reviewed in a browser.
+6. **Dashboard review covers desktop only.** Automated tests confirm every page renders against the live
+   database, and a visual review of all six pages on desktop was done in a headless browser (it found and fixed
+   unreadable dark-mode text, raw axis labels and a missing sample warning). Mobile layout was not reviewed.
 7. **Local development database.** The setup scripts target a local PostgreSQL instance and are not
    hardened for production use.
 

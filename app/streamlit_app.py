@@ -135,14 +135,20 @@ def page_crops() -> None:
         y=metric,
         color="item_name",
         markers=True,
+        labels={
+            "production_t": "Production (t)",
+            "area_harvested_ha": "Area harvested (ha)",
+            "yield_reported_kg_ha": "Yield (kg/ha)",
+            "year": "Year",
+        },
         color_discrete_sequence=[BLUE, NAVY, "#7FB2E5"],
     )
-    st.plotly_chart(style(fig), use_container_width=True)
+    st.plotly_chart(style(fig), width="stretch")
     st.caption(
         "Missing observations appear as gaps; FAOSTAT flag 'E' = estimated, 'I' = imputed by FAO, 'A' = official."
     )
     with st.expander("Data table"):
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width="stretch")
     st.download_button("Download CSV", df.to_csv(index=False), "crop_production.csv", "text/csv")
 
 
@@ -157,9 +163,18 @@ def page_rainfall() -> None:
     if available.empty or pd.isna(available.loc[0, "n"]) or available.loc[0, "n"] == 0:
         st.info("No rainfall data loaded yet. Run the pipeline with the chirps source.")
         return
-    st.caption(
-        f"{int(available.loc[0, 'n'])} month(s) loaded: {int(available.loc[0, 'lo'])} to {int(available.loc[0, 'hi'])}"
-    )
+    n_months, lo, hi = int(available.loc[0, "n"]), int(available.loc[0, "lo"]), int(available.loc[0, "hi"])
+
+    def fmt(key: int) -> str:
+        return f"{key // 100}-{key % 100:02d}"  # date_key 202307 -> "2023-07"
+
+    if n_months < 12:
+        st.warning(
+            f"Only {n_months} month(s) of CHIRPS rainfall are loaded ({fmt(lo)} to {fmt(hi)}). "
+            "This page shows a validated sample of the pipeline, not a historical rainfall analysis."
+        )
+    else:
+        st.caption(f"{n_months} months loaded: {fmt(lo)} to {fmt(hi)}")
     names = st.multiselect(
         "Provinces", prov["geography_name"].tolist(), default=prov["geography_name"].tolist()[:3]
     )
@@ -182,6 +197,7 @@ def page_rainfall() -> None:
             x="precip_mean_mm",
             y="province",
             orientation="h",
+            labels={"precip_mean_mm": "Mean monthly rainfall (mm)", "province": ""},
             color_discrete_sequence=[BLUE],
         )
     else:
@@ -190,11 +206,12 @@ def page_rainfall() -> None:
             x="month_start",
             y="precip_mean_mm",
             color="province",
+            labels={"precip_mean_mm": "Mean monthly rainfall (mm)", "month_start": "Month"},
             color_discrete_sequence=px.colors.sequential.Blues_r,
         )
-    st.plotly_chart(style(fig), use_container_width=True)
+    st.plotly_chart(style(fig), width="stretch")
     st.caption("Mean of pixel monthly totals (mm) inside each province; 0.05 degree resolution.")
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df, width="stretch")
 
 
 def page_indicators() -> None:
@@ -210,7 +227,7 @@ def page_indicators() -> None:
         {"k": key},
     )
     fig = px.line(df, x="year", y="value", markers=True, color_discrete_sequence=[BLUE])
-    st.plotly_chart(style(fig), use_container_width=True)
+    st.plotly_chart(style(fig), width="stretch")
     missing = int(df["value"].isna().sum())
     st.caption(f"{missing} of {len(df)} years have no published value (shown as gaps).")
 
@@ -224,7 +241,7 @@ def page_quality() -> None:
         """
     )
     st.subheader("Recent ingestion runs")
-    st.dataframe(log, use_container_width=True)
+    st.dataframe(log, width="stretch")
     dq = query(
         """
         select source_name, check_name, passed, n_violations, severity, detail
@@ -236,13 +253,13 @@ def page_quality() -> None:
         """
     )
     st.subheader("Latest source-level checks")
-    st.dataframe(dq, use_container_width=True)
+    st.dataframe(dq, width="stretch")
     st.subheader("Sources and licences")
     st.dataframe(
         query(
             "select source_key, publisher, licence_summary, native_grain, latest_loaded_at from gold.dim_data_source"
         ),
-        use_container_width=True,
+        width="stretch",
     )
 
 
@@ -270,7 +287,10 @@ PAGES = {
     "About": page_about,
 }
 
-choice = st.sidebar.radio("Navigate", list(PAGES))
+# Deep link support: ?page=Rainfall opens that page first (the sidebar still works normally).
+_requested = st.query_params.get("page", "Overview")
+_names = list(PAGES)
+choice = st.sidebar.radio("Navigate", _names, index=_names.index(_requested) if _requested in _names else 0)
 try:
     PAGES[choice]()
 except Exception as exc:  # show a readable error instead of a stack trace in the UI

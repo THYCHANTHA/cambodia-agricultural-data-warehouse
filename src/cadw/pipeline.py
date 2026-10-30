@@ -42,7 +42,7 @@ def ingest_faostat(settings: Settings) -> int:
         "faostat_production",
         source_url=faostat.FAOSTAT_URL,
         source_sha256=info["sha256"],
-        licence="see docs/data_sources.md",
+        licence="CC BY 4.0 (FAO)",
     )
     try:
         df = faostat.to_bronze(faostat.read_country_from_zip(zip_path, settings.country_m49))
@@ -132,7 +132,7 @@ def ingest_chirps(settings: Settings, boundary_rows: int) -> int:
         engine,
         "chirps_province_monthly",
         source_url=settings.chirps_base_url,
-        licence="see docs/data_sources.md",
+        licence="Public domain / CC BY 4.0 (CHC); cite doi:10.15780/G2JQ0P",
         notes=f"{len(settings.chirps_periods())} months, first={settings.chirps_periods()[0]}",
     )
     try:

@@ -72,26 +72,29 @@ batch in `audit.data_quality_results`.
 
 ## 5. Validation evidence
 
-All figures are from executed runs on 2026-10-31 (see `reports/validation_2026-10-31.md`).
+All figures are from executed runs on 2026-10-31 (see `reports/validation_2026-10-31_dbt-1.11.16.md`; an
+earlier run on a dbt pre-release is kept as `reports/validation_2026-10-31_dbt-1.13.0b1_superseded.md`).
 
 | Check | Result |
 |---|---|
-| Python unit and hygiene tests | 32 passed |
-| Database integration tests | 4 passed |
-| Dashboard page smoke tests | 8 passed |
-| `dbt test` | 42 of 42 passed |
+| Python unit and repository-hygiene tests | 32 passed |
+| Database integration and dashboard tests | 13 passed |
+| `dbt test` (dbt-core 1.11.16, dbt-postgres 1.11.0) | 42 of 42 passed |
 | `scripts/verify_gold.py` | 31 of 31 passed |
 | FAOSTAT Cambodia rows loaded | 12,621 (matches an independent pre-count) |
 | World Bank rows loaded | 528 (8 indicators x 66 years) |
 | Provinces loaded | 25 |
-| CHIRPS | 1 month (2023-07), 25 province rows, 100% valid pixels |
+| CHIRPS | **1 month (2023-07)**, 25 province rows, 100% valid pixels |
 
-Defects found only by executing against a real database, and fixed:
+Defects found only by executing against a real database or by reviewing the running application, and fixed:
 
 1. Batch ids were written as text into a `uuid` column, so every Bronze insert failed. The failed
    transaction left Bronze empty (atomicity confirmed). Fixed, with regression tests.
 2. `dim_year` started in 1961 but the World Bank series starts in 1960, so 8 facts had no matching year. The
    dimension was corrected; the test was not weakened.
+3. A unit test depended on the developer's environment variables; it now isolates them.
+4. In the dashboard, sidebar text was unreadable in dark mode, chart axes showed raw column names, and the
+   rainfall page did not state that only one month was loaded. All fixed; the disclosure has a regression test.
 
 ## 6. Reproducibility
 
