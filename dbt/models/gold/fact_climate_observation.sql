@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (geography_key, date_key)") }}
 -- Grain: one row per province x month. Source: CHIRPS v3.0 (0.05 degree), aggregated to ADM1.
 -- Values are the spatial mean/min/max of pixel monthly totals (mm). valid_pixel_ratio exposes coverage.
 select

@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (indicator_key)") }}
 -- Grain: one row per World Bank indicator.
 select
     indicator_code      as indicator_key,

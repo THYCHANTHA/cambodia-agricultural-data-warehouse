@@ -1,2 +1,5 @@
 # Installed into its own virtualenv (.venv-dbt): dbt and prefect pin conflicting dependencies.
-dbt-postgres
+# These are the exact versions the warehouse was validated with. dbt-core 1.13.0b1 is a PRE-RELEASE;
+# pip needs --pre or the exact pin below. Full dependency set: requirements-dbt.lock
+dbt-core==1.13.0b1
+dbt-postgres==1.11.0

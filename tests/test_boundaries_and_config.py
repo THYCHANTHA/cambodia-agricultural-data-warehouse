@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 
@@ -47,5 +48,8 @@ def test_database_url_escapes_special_characters_and_hides_password():
     assert "p@ss" not in repr(s)
 
 
-def test_defaults_do_not_ship_a_password():
+def test_defaults_do_not_ship_a_password(monkeypatch):
+    for name in list(os.environ):
+        if name.startswith("CADW_"):
+            monkeypatch.delenv(name)  # isolate from the developer's real environment
     assert Settings(_env_file=None).db_password == ""

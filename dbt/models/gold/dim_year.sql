@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (year)") }}
 -- Grain: one row per calendar year (from 1960, the first World Bank observation year). Annual facts
 -- (FAOSTAT, World Bank) reference this dimension.
 select

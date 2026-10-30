@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (date_key)") }}
 -- Grain: one row per calendar month. Monthly facts (CHIRPS) reference this dimension.
 -- rainy_season_approx is a coarse climatological label (southwest monsoon, May-Oct), not an observation.
 select

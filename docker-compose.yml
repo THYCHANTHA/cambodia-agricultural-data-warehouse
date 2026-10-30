@@ -1,0 +1,50 @@
+# UNTESTED: Docker was not available on the development machine. Validate with `docker compose config`
+# and a first `docker compose up` before relying on it.
+#
+# Usage:   cp .env.example .env   (set CADW_DB_PASSWORD in .env; do not commit it)
+#          docker compose up -d db
+#          docker compose run --rm pipeline          # ingest + dbt (sample: set CADW_CHIRPS_SAMPLE_MONTHS)
+#          docker compose up dashboard               # http://localhost:8501
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?set POSTGRES_ADMIN_PASSWORD in .env}
+      CADW_DB_PASSWORD: ${CADW_DB_PASSWORD:?set CADW_DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pipeline:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: &appenv
+      CADW_DB_HOST: db
+      CADW_DB_USER: cadw
+      CADW_DB_NAME: cambodia_dw
+      CADW_DB_PASSWORD: ${CADW_DB_PASSWORD:?set CADW_DB_PASSWORD in .env}
+      CADW_CHIRPS_SAMPLE_MONTHS: ${CADW_CHIRPS_SAMPLE_MONTHS:-["2023-07"]}
+    command: ["python", "-m", "cadw.cli", "run"]
+    profiles: ["jobs"]
+
+  dashboard:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment: *appenv
+    ports:
+      - "127.0.0.1:8501:8501"
+
+volumes:
+  pgdata:

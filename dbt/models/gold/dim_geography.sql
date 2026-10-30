@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (geography_key)") }}
 -- Grain: one row per geographic unit. Hierarchy: country -> province.
 -- Surrogate keys are deterministic hashes of the level and natural id, so reloads never reshuffle keys.
 -- No slowly-changing history: the sources provide a single boundary vintage (geoBoundaries 2017),

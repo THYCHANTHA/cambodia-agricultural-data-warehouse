@@ -1,0 +1,9 @@
+.venv/
+.venv-dbt/
+.git/
+.env
+data/
+dbt/target/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

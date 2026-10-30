@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (source_key)") }}
 -- Grain: one row per source system, with the most recent successful ingestion attached.
 with latest as (
     select distinct on (source_name)

@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below. Data sources have their own citations: see docs/data_sources.md."
+title: "Cambodia Agricultural Data Warehouse"
+type: software
+authors:
+  - family-names: Chantha
+    given-names: Thy
+version: 0.1.0
+date-released: 2026-10-31
+license: MIT
+abstract: >-
+  A research prototype integrating FAOSTAT, World Bank, CHIRPS and geoBoundaries data for Cambodia into a
+  tested PostgreSQL star schema using a Bronze, Silver and Gold architecture.
+keywords:
+  - data warehouse
+  - dimensional modelling
+  - ETL
+  - dbt
+  - agricultural statistics
+  - Cambodia

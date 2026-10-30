@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (geography_key, crop_key, year)") }}
 -- Grain: one row per country x year x crop item. FAOSTAT is national only: provincial yield is
 -- NOT available here and must never be inferred from this table.
 -- Production (t), area harvested (ha) and reported yield come from the same FAOSTAT record set, so

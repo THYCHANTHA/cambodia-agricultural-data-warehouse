@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (crop_key)") }}
 -- Grain: one row per FAOSTAT item. item_type is derived from which elements the item reports:
 --   crop               reports 'Area harvested'
 --   livestock          reports animal-count elements (stocks, producing/slaughtered, laying, milk animals)

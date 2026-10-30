@@ -1,3 +1,4 @@
+{{ config(post_hook="alter table {{ this }} add primary key (geography_key, indicator_key, year)") }}
 -- Grain: one row per country x year x World Bank indicator (missing observations kept, value NULL).
 select
     md5('country|' || country_iso3)     as geography_key,
