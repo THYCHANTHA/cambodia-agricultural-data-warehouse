@@ -91,7 +91,7 @@ def months(start_year: int, end_year: int) -> Iterable[tuple[int, int]]:
 
 
 def ingest(
-    base_url: str, start_year: int, end_year: int, geometries: dict[str, dict], *, workers: int = 4
+    base_url: str, periods: Iterable[tuple[int, int]], geometries: dict[str, dict], *, workers: int = 4
 ) -> pd.DataFrame:
     """Aggregate every month in the window (I/O bound, so threaded).
 
@@ -110,7 +110,7 @@ def ingest(
             return ym, exc
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        for (year, month), result in pool.map(one, months(start_year, end_year)):
+        for (year, month), result in pool.map(one, list(periods)):
             if isinstance(result, Exception):
                 log.error("CHIRPS %d-%02d failed: %s", year, month, result)
                 failures.append((year, month, str(result)))

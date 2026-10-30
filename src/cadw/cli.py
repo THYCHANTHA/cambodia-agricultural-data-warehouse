@@ -8,7 +8,11 @@ import logging
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="cadw", description="Cambodia Agricultural Data Warehouse")
-    parser.add_argument("command", choices=["init-db", "run", "run-without-chirps"])
+    parser.add_argument("command", choices=["init-db", "run"])
+    parser.add_argument(
+        "--sources", nargs="+", default=None, help="subset of: faostat worldbank boundaries chirps"
+    )
+    parser.add_argument("--no-dbt", action="store_true", help="skip dbt seed/run/test")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -18,7 +22,10 @@ def main(argv: list[str] | None = None) -> int:
         pipeline.apply_only()
         print("schemas and Bronze tables are in place")
     else:
-        pipeline.run_pipeline(skip_chirps=args.command == "run-without-chirps")
+        pipeline.run_pipeline(
+            sources=tuple(args.sources) if args.sources else pipeline.ALL_SOURCES,
+            with_dbt=not args.no_dbt,
+        )
     return 0
 
 

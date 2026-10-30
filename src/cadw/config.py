@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     # CHIRPS is read month by month; keep the window explicit and configurable.
     chirps_start_year: int = 2000
     chirps_end_year: int = 2024
+    # Optional explicit sample such as ["2023-07"]; when set it overrides the year window.
+    chirps_sample_months: list[str] = []
     chirps_base_url: str = "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/monthly/global/tifs"
 
     http_timeout_s: int = 120
@@ -45,6 +47,11 @@ class Settings(BaseSettings):
         "NY.GDP.MKTP.CD",  # GDP (current US$)
         "AG.CON.FERT.ZS",  # Fertilizer consumption (kg per hectare of arable land)
     ]
+
+    def chirps_periods(self) -> list[tuple[int, int]]:
+        if self.chirps_sample_months:
+            return [(int(m[:4]), int(m[5:7])) for m in self.chirps_sample_months]
+        return [(y, m) for y in range(self.chirps_start_year, self.chirps_end_year + 1) for m in range(1, 13)]
 
     @property
     def database_url(self) -> URL:

@@ -77,10 +77,8 @@ def expected_count(df: pd.DataFrame, source: str, expected: int, label: str) -> 
     )
 
 
-def chirps_completeness(
-    df: pd.DataFrame, n_provinces: int, start_year: int, end_year: int, failures: list
-) -> CheckResult:
-    expected = n_provinces * 12 * (end_year - start_year + 1)
+def chirps_completeness(df: pd.DataFrame, n_provinces: int, n_months: int, failures: list) -> CheckResult:
+    expected = n_provinces * n_months
     got = len(df)
     return CheckResult(
         "chirps_province_monthly",

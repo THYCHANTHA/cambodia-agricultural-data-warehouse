@@ -133,7 +133,7 @@ def ingest_chirps(settings: Settings, boundary_rows: int) -> int:
         "chirps_province_monthly",
         source_url=settings.chirps_base_url,
         licence="see docs/data_sources.md",
-        notes=f"window {settings.chirps_start_year}-{settings.chirps_end_year}",
+        notes=f"{len(settings.chirps_periods())} months, first={settings.chirps_periods()[0]}",
     )
     try:
         import pandas as pd
@@ -141,17 +141,14 @@ def ingest_chirps(settings: Settings, boundary_rows: int) -> int:
         with engine.connect() as conn:
             bdf = pd.read_sql("select shape_id, geometry_geojson from bronze.geoboundaries_adm1", conn)
         geoms = chirps.province_geometries(bdf)
-        df = chirps.ingest(
-            settings.chirps_base_url, settings.chirps_start_year, settings.chirps_end_year, geoms
-        )
+        periods = settings.chirps_periods()
+        df = chirps.ingest(settings.chirps_base_url, periods, geoms)
         failures = df.attrs.get("failures", [])
         results = [
             checks.not_empty(df, "chirps_province_monthly"),
             checks.no_duplicate_keys(df, "chirps_province_monthly", ["province_key", "year", "month"]),
             checks.value_range(df, "chirps_province_monthly", "precip_mean_mm", 0, 2500),
-            checks.chirps_completeness(
-                df, len(geoms), settings.chirps_start_year, settings.chirps_end_year, failures
-            ),
+            checks.chirps_completeness(df, len(geoms), len(periods), failures),
         ]
         _gate(engine, batch, results)
         n = warehouse.load_bronze(engine, "chirps_province_monthly", df, batch)
@@ -175,21 +172,32 @@ def run_dbt(command: list[str]) -> None:
         raise RuntimeError(f"dbt {' '.join(command)} failed:\n{proc.stdout[-3000:]}\n{proc.stderr[-1000:]}")
 
 
-@flow(name="cambodia-agricultural-warehouse")
-def run_pipeline(settings: Settings | None = None, skip_chirps: bool = False) -> None:
-    settings = settings or get_settings()
-    engine = warehouse.make_engine(settings)
-    warehouse.apply_ddl(engine)
+ALL_SOURCES = ("faostat", "worldbank", "boundaries", "chirps")
 
-    ingest_faostat(settings)
-    ingest_worldbank(settings)
-    n_boundaries = ingest_boundaries(settings)
-    if not skip_chirps:
+
+@flow(name="cambodia-agricultural-warehouse")
+def run_pipeline(
+    settings: Settings | None = None, sources: tuple[str, ...] = ALL_SOURCES, with_dbt: bool = True
+) -> None:
+    """Ingest the chosen sources into Bronze, then (optionally) build and test Silver/Gold with dbt."""
+    settings = settings or get_settings()
+    unknown = set(sources) - set(ALL_SOURCES)
+    if unknown:
+        raise ValueError(f"unknown sources: {sorted(unknown)}")
+    warehouse.apply_ddl(warehouse.make_engine(settings))
+
+    if "faostat" in sources:
+        ingest_faostat(settings)
+    if "worldbank" in sources:
+        ingest_worldbank(settings)
+    n_boundaries = ingest_boundaries(settings) if "boundaries" in sources else 0
+    if "chirps" in sources:
         ingest_chirps(settings, n_boundaries)
 
-    run_dbt(["seed"])
-    run_dbt(["run"])
-    run_dbt(["test"])
+    if with_dbt:
+        run_dbt(["seed"])
+        run_dbt(["run"])
+        run_dbt(["test"])
 
 
 def apply_only(settings: Settings | None = None) -> Path:

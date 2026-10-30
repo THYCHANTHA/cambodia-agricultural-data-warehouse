@@ -7,7 +7,7 @@ import uuid
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Engine, Uuid, create_engine, text
 
 from .config import PROJECT_ROOT, Settings
 
@@ -62,17 +62,30 @@ def finish_batch(
 
 
 def load_bronze(
-    engine: Engine, table: str, df: pd.DataFrame, batch_id: uuid.UUID, *, chunksize: int = 5000
+    engine: Engine,
+    table: str,
+    df: pd.DataFrame,
+    batch_id: uuid.UUID,
+    *,
+    schema: str = "bronze",
+    chunksize: int = 2000,
 ) -> int:
-    """Replace the contents of bronze.<table> with `df` in a single transaction."""
+    """Replace the contents of <schema>.<table> with `df` in a single transaction (all or nothing)."""
     if df.empty:
-        raise ValueError(f"refusing to load an empty frame into bronze.{table}")
+        raise ValueError(f"refusing to load an empty frame into {schema}.{table}")
     frame = df.copy()
-    frame["_batch_id"] = str(batch_id)
+    frame["_batch_id"] = batch_id
     with engine.begin() as conn:
-        conn.exec_driver_sql(f"TRUNCATE TABLE bronze.{table}")
+        conn.exec_driver_sql(f'TRUNCATE TABLE "{schema}"."{table}"')
         frame.to_sql(
-            table, conn, schema="bronze", if_exists="append", index=False, chunksize=chunksize, method="multi"
+            table,
+            conn,
+            schema=schema,
+            if_exists="append",
+            index=False,
+            chunksize=chunksize,
+            method="multi",
+            dtype={"_batch_id": Uuid()},
         )
     return len(frame)
 

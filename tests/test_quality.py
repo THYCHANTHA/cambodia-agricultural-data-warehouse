@@ -36,10 +36,10 @@ def test_not_empty_and_required_columns():
 
 
 def test_chirps_completeness_detects_missing_months_and_failures():
-    full = pd.DataFrame({"x": range(25 * 12 * 2)})
-    assert checks.chirps_completeness(full, 25, 2000, 2001, []).passed
-    assert not checks.chirps_completeness(full.iloc[:-1], 25, 2000, 2001, []).passed
-    assert not checks.chirps_completeness(full, 25, 2000, 2001, [(2000, 1, "timeout")]).passed
+    full = pd.DataFrame({"x": range(25 * 24)})
+    assert checks.chirps_completeness(full, 25, 24, []).passed
+    assert not checks.chirps_completeness(full.iloc[:-1], 25, 24, []).passed
+    assert not checks.chirps_completeness(full, 25, 24, [(2000, 1, "timeout")]).passed
 
 
 def test_summarise_reports_errors():
