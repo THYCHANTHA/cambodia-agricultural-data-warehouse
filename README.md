@@ -53,7 +53,7 @@ a dbt pre-release is kept as [a superseded record](reports/validation_2026-10-31
 | Item | Status |
 |---|---|
 | **Docker** (`Dockerfile`, `docker-compose.yml`) | **Written but never built or run.** Docker is not installed on the development machine. Treat as untested |
-| GitHub Actions workflow | See the CI badge/results note below |
+| **GitHub Actions workflow** (`.github/workflows/ci.yml`) | **Never executed.** The first run (2026-10-31) failed to start: GitHub reported *"The job was not started because your account is locked due to a billing issue."* This is an account-level block, not a test failure, so there is **no CI result**. The same checks pass locally (see above); CI will be confirmed once the account issue is resolved and the workflow re-run |
 | Rainfall beyond July 2023 | **Not loaded, not validated.** No historical rainfall analysis is claimed |
 | Mobile layout of the dashboard | Not reviewed |
 | Linux and macOS | Not run locally. Lock files were captured on Windows; CI installs from `requirements.txt` |

@@ -29,7 +29,7 @@ This is a research prototype, not an official statistical product.
 3. **No slowly changing dimensions.** Only one boundary vintage exists.
 4. **Docker files are untested.** Docker is not installed on the development machine, so the container
    configuration has never been built or run.
-5. **CI is unverified until the first GitHub run.** The workflow could not be executed locally.
+5. **CI has never run.** The first GitHub Actions run could not start because the owner's GitHub account was locked for a billing issue (reported by GitHub as the reason the job was not started). The workflow is therefore untested on GitHub; the equivalent checks were run locally. It also still has to exercise `scripts/setup_database.sql` for the first time.
 6. **Dashboard review covers desktop only.** Automated tests confirm every page renders against the live
    database, and a visual review of all six pages on desktop was done in a headless browser (it found and fixed
    unreadable dark-mode text, raw axis labels and a missing sample warning). Mobile layout was not reviewed.
